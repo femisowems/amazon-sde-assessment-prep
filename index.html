@@ -1,0 +1,801 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Amazon Assessment Research</title>
+<style>
+  :root{
+    --bg:#f7f5f0; --surface:#ffffff; --surface2:#f0ede6; --ink:#171a1f; --muted:#5b6068; --line:#ddd8cc;
+    --navy:#131a22; --navy2:#232f3e; --amber:#b96a00; --amber-bg:#fdf0d8; --green:#1a6b3c; --green-bg:#e2f2e6;
+    --red:#9b2c1e; --red-bg:#fbe9e5; --blue:#1d4f7a; --blue-bg:#e3eef7;
+    --radius:14px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#121417; --surface:#1b1e23; --surface2:#23262c; --ink:#ece9e2; --muted:#a8adb5; --line:#33373f;
+      --amber:#e8a04a; --amber-bg:#3a2c12; --green:#6fcf8f; --green-bg:#16301f; --red:#f0957f; --red-bg:#3a1e18;
+      --blue:#8dbede; --blue-bg:#1a2f42; }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;font-size:16.5px}
+  h1,h2,h3{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;line-height:1.2;margin:0}
+  a{color:var(--blue);text-underline-offset:3px}
+  .wrap{max-width:900px;margin:0 auto;padding:0 18px 64px}
+  /* header band */
+  .band{background:var(--navy);color:#f3f1ea;margin:0 -18px;padding:28px 18px 24px}
+  @media(min-width:940px){.band{margin:0 calc(50% - 50vw);padding-left:calc(50vw - 450px + 18px);padding-right:calc(50vw - 450px + 18px)}}
+  .band .kicker{font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:#f5b04a;font-weight:700}
+  .band h1{font-size:clamp(28px,5.5vw,42px);margin:8px 0 10px;color:#fff}
+  .band p{margin:0;color:#cfd4da;max-width:680px;font-size:16px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .meta span{background:var(--navy2);border:1px solid #3a4756;color:#e8ebee;border-radius:999px;padding:7px 13px;font-size:13.5px}
+  .meta b{color:#f5b04a;font-weight:700}
+  /* verdict */
+  .verdict{background:var(--surface);border:1.5px solid var(--amber);border-radius:var(--radius);padding:20px;margin:22px 0}
+  .verdict h2{font-size:24px;margin-bottom:8px}
+  .verdict .big{font-size:17.5px}
+  .verdict .big strong{color:var(--amber)}
+  /* nav */
+  nav.toc{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+  nav.toc a{background:var(--surface);border:1px solid var(--line);color:var(--ink);text-decoration:none;border-radius:999px;padding:9px 14px;font-size:14px;min-height:38px;display:inline-flex;align-items:center}
+  nav.toc a:hover{border-color:var(--amber)}
+  section{margin-top:38px}
+  section>h2{font-size:27px;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:6px}
+  section>.lede{color:var(--muted);margin:8px 0 16px;max-width:720px}
+  h3{font-size:19px;margin:22px 0 8px}
+  p{margin:10px 0}
+  ul,ol{margin:8px 0 14px;padding-left:22px}
+  li{margin:5px 0}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:14px 0}
+  .card h3{margin-top:0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:640px){.grid2{grid-template-columns:1fr}}
+  .tag{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:5px;padding:2px 8px;vertical-align:middle;white-space:nowrap}
+  .tag.off{background:var(--green-bg);color:var(--green)}
+  .tag.rep{background:var(--blue-bg);color:var(--blue)}
+  .tag.con{background:var(--amber-bg);color:var(--amber)}
+  .src{font-size:13.5px;color:var(--muted)}
+  /* timeline */
+  .timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+  @media(max-width:640px){.timeline{grid-template-columns:1fr 1fr}}
+  .tstep{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--navy2);border-radius:10px;padding:12px}
+  @media (prefers-color-scheme: dark){.tstep{border-top-color:#f5b04a}}
+  .tstep .t{font-family:Georgia,serif;font-size:22px;font-weight:700}
+  .tstep .l{font-weight:700;font-size:14.5px}
+  .tstep .d{font-size:13.5px;color:var(--muted)}
+  /* workflow */
+  .flow{background:var(--navy);color:#e8ebee;border-radius:var(--radius);padding:18px 20px;margin:14px 0;font-size:15px}
+  .flow code{color:#f5b04a;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13.5px}
+  .flow ol{padding-left:20px}
+  .flow li{margin:7px 0}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em;background:var(--surface2);padding:1px 6px;border-radius:5px}
+  pre{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;font-size:13.5px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+  pre code{background:none;padding:0}
+  /* tables -> stacked on mobile */
+  table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:14px 0;font-size:15px}
+  th,td{text-align:left;padding:11px 14px;vertical-align:top;border-bottom:1px solid var(--line)}
+  th{background:var(--surface2);font-size:13px;letter-spacing:.05em;text-transform:uppercase}
+  tr:last-child td{border-bottom:none}
+  td.good{border-left:4px solid var(--green)}
+  td.bad{border-left:4px solid var(--red)}
+  @media(max-width:640px){
+    table,thead,tbody,tr,td{display:block;width:100%}
+    thead{display:none}
+    tr{border-bottom:2px solid var(--line);padding:6px 0}
+    td{border-bottom:none;padding:7px 14px}
+    td::before{content:attr(data-h);display:block;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+  }
+  /* checklist as styled list (not form checkboxes) */
+  .checklist{list-style:none;padding:0;margin:10px 0}
+  .checklist li{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:8px 0;align-items:flex-start}
+  .box{flex:0 0 auto;width:22px;height:22px;border:2px solid var(--muted);border-radius:6px;margin-top:2px}
+  .checklist .pri{font-size:12px;font-weight:800;color:var(--amber);letter-spacing:.05em}
+  .go li .box{border-color:var(--green)}
+  .wait li .box{border-color:var(--red)}
+  /* readiness scorer */
+  .scorer{background:var(--surface);border:1.5px solid var(--ink);border-radius:var(--radius);padding:20px;margin:16px 0}
+  .scorer h3{margin-top:0;font-size:20px}
+  .crit{width:100%;text-align:left;background:var(--surface2);border:1.5px solid var(--line);border-radius:10px;padding:13px 15px;margin:8px 0;font-size:15.5px;color:var(--ink);cursor:pointer;min-height:48px;display:flex;gap:12px;align-items:flex-start;font-family:inherit;line-height:1.5}
+  .crit .dot{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:2px solid var(--muted);margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff}
+  .crit.on{border-color:var(--green);background:var(--green-bg)}
+  .crit.on .dot{background:var(--green);border-color:var(--green)}
+  #verdictOut{margin-top:14px;padding:14px 16px;border-radius:10px;font-size:16px;display:none}
+  #verdictOut.go{display:block;background:var(--green-bg);border:1px solid var(--green)}
+  #verdictOut.wait{display:block;background:var(--red-bg);border:1px solid var(--red)}
+  .warn{background:var(--amber-bg);border:1px solid var(--amber);border-radius:var(--radius);padding:14px 18px;margin:14px 0;font-size:15.5px}
+  .note{background:var(--surface2);border-radius:var(--radius);padding:14px 18px;margin:14px 0;font-size:15px}
+  .lp{columns:2;column-gap:28px;font-size:15px}
+  @media(max-width:640px){.lp{columns:1}}
+  .lp li{break-inside:avoid}
+  footer{margin-top:48px;border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:13.5px}
+  .srclist{font-size:14.5px}
+  .srclist li{margin:9px 0}
+  button:focus-visible,a:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+  /* Q2 prompt kit */
+  .prompt{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 15px;margin:9px 0}
+  .prompt .when{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);margin-bottom:5px}
+  .prompt .txt{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;line-height:1.55;overflow-wrap:anywhere}
+  .prompt .why{font-size:13.5px;color:var(--muted);margin-top:6px}
+  .copybtn{margin-top:9px;background:var(--surface2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 13px;font-size:13.5px;font-weight:600;cursor:pointer;min-height:38px;font-family:inherit}
+  .copybtn:hover{border-color:var(--amber)}
+  .copybtn.done{border-color:var(--green);color:var(--green)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="band">
+    <div class="kicker">Research briefing · Researched November 2026</div>
+    <h1>Amazon SDE Online Assessment — should you take it tomorrow?</h1>
+    <p>Everything below is drawn from a full research pass on the current 2025–2026 HackerRank format: what each section actually is, what decides the outcome, and a clear go / wait call for tomorrow. Labels show how solid each claim is — <b>Official</b> (Amazon / HackerRank), <b>Reported</b> (2026 candidate reports — useful, but anecdotal), <b>Conflict</b> (sources disagree; the invite wins).</p>
+    <div class="meta">
+      <span>Role: <b>SDE II</b></span>
+      <span>Format: <b>HackerRank</b></span>
+      <span>Deadline: <b>within the 1-week window</b></span>
+      <span>Sitting: <b>~2.5 hrs, one go, no pausing</b></span>
+    </div>
+  </div>
+
+  <div class="verdict" role="region" aria-label="Bottom line">
+    <h2>The bottom line</h2>
+    <p class="big"><strong>Default call: WAIT — unless you clear all five checks tonight.</strong> You have a structural edge in the repo question <em>if</em> you pick Node.js. The risk is Q1: in this new format the single traditional problem is reported as LeetCode Medium to Medium-Hard in ~40 minutes — harder than old guides imply. There is <strong>no reported bonus for submitting on day 1 vs day 5</strong>, and 3–4 focused days is the highest-value move if tonight's checks fail. Use the readiness checker in §6 before you decide.</p>
+    <p style="margin-bottom:0">One warning up front: <strong>trust your invite over every public prep page.</strong> Amazon officially announced this reimagined, AI-assisted format on 22 Jan 2026 <span class="tag off">Official</span>, and HackerRank's Amazon OA guide confirms the mechanics — but Amazon.jobs prep pages still describe the <em>old</em> format (70–90 min / 2 coding problems) and never mention the AI repo task. <span class="tag con">Conflict</span> <span class="src">Sources: <a href="https://www.aboutamazon.com/news/workplace/artificial-intelligence-resume-jobs-hiring-amazon">About Amazon, 22 Jan 2026</a> · <a href="https://candidatesupport.hackerrank.com/articles/1494260168-preparing-for-your-amazon-oa">HackerRank — Preparing for your Amazon OA</a></span></p>
+  </div>
+
+  <nav class="toc" aria-label="Sections">
+    <a href="#format">1 · The format</a>
+    <a href="#q1">2 · Q1 Traditional</a>
+    <a href="#q2">3 · Q2 Repo + AI</a>
+    <a href="#sim">4 · Work Simulation</a>
+    <a href="#surveys">5 · Work Style Surveys</a>
+    <a href="#ready">6 · Go / Wait + tonight's plan</a>
+    <a href="#rules">7 · Rules &amp; logistics</a>
+    <a href="#unknowns">8 · Open questions</a>
+    <a href="#sources">Sources</a>
+  </nav>
+
+  <!-- FORMAT -->
+  <section id="format">
+    <h2>1 · What you're actually sitting</h2>
+    <p class="lede">Four parts, one sitting, in this order. Coding comes first — and once you leave it, you cannot go back. <span class="tag off">Official</span></p>
+    <div class="timeline">
+      <div class="tstep"><div class="t">~40 min</div><div class="l">Q1 — Traditional coding</div><div class="d">One problem, single file, your choice of language inside the test (JavaScript/Node available).</div></div>
+      <div class="tstep"><div class="t">~60 min</div><div class="l">Q2 — Repo + AI assistant</div><div class="d">Multi-file project in a full IDE. Framework picked <em>before</em> you start — it locks and cannot be switched.</div></div>
+      <div class="tstep"><div class="t">~15 min*</div><div class="l">Work Simulation</div><div class="d">Software-development decisions, rated for effectiveness. *Label often understates real time — see §4.</div></div>
+      <div class="tstep"><div class="t">~10 min*</div><div class="l">Work Style Surveys ×2</div><div class="d">Forced-choice preference items. *Also reported to run longer — see §5.</div></div>
+    </div>
+    <div class="card">
+      <h3>Mechanics that matter <span class="tag off">Official</span></h3>
+      <ul>
+        <li><strong>Finish Coding (Q1) first — you cannot return to it</strong> after switching to the Code Repository section.</li>
+        <li><strong>Q1 tests: 2 sample + 13 hidden</strong> (hidden ones show a lock icon). Validation is exact string matching. Most questions expect a <em>returned value</em>; <code>console.log</code> goes to Debug Output and doesn't score — but if a question expects printed output, remove debug prints before submitting or it can fail.</li>
+        <li><strong>Q2:</strong> the IDE autosaves; if time runs out you're logged out and <strong>the most recent auto-saved version is evaluated</strong>. Run Tests runs a predefined set per task with pass/fail, errors and assertions shown. Do <strong>not</strong> modify <code>README.md</code> / read-only files, and do not change IDs/classes of existing UI elements — tests depend on them.</li>
+        <li><strong>Setup:</strong> latest Chrome/Edge per your invite, disable browser extensions, enable third-party cookies, stable network (HackerRank calls ~10 Mbps “good”). Repo IDE initialisation can take up to a minute and is <strong>not</strong> counted in test time.</li>
+      </ul>
+      <p class="src">Source: <a href="https://candidatesupport.hackerrank.com/articles/1494260168-preparing-for-your-amazon-oa">HackerRank Candidate Support — Preparing for your Amazon OA</a> (verified live in research).</p>
+    </div>
+    <div class="warn"><strong>Unconfirmed:</strong> whether your 100 minutes is one shared pool or hard ~40 / ~60 sub-timers, and whether unused Q1 time carries over. Candidate reports lean toward separately timed parts, and one candidate recalled leftover time <em>not</em> carrying over (single-source, anecdotal). <span class="tag rep">Reported</span> <strong>Plan as if there is no carry-over:</strong> hard-stop Q1 at ~40 minutes. Confirm the real split on the demo / landing page tonight.</div>
+  </section>
+
+  <!-- Q1 -->
+  <section id="q1">
+    <h2>2 · Q1 — Traditional coding (the risk)</h2>
+    <p class="lede">One problem, ~40 minutes, LeetCode Medium to Medium-Hard in the new format. A weak Q1 is not rescued by a strong Q2. <span class="tag rep">Reported</span></p>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>Difficulty — then vs now</h3>
+        <ul>
+          <li><strong>Old format</strong> (2 problems, 70–90 min): typically LeetCode Medium; first sometimes Easy-Medium, second Medium-Hard.</li>
+          <li><strong>New format (yours):</strong> “It got harder, not easier… the old advice about Amazon OAs being easy is out of date.” A first-hand SDE II candidate rated his problem Medium-Hard and ran out of time despite being close.</li>
+          <li><strong>Hard / exotic is rare</strong> in the OA itself. Don't spend tonight on Hard DP, segment trees, or trie exotica at the expense of Medium fluency.</li>
+        </ul>
+        <p class="src">Sources: <a href="https://nyrion.ai/companies/amazon">Nyrion (31 candidate threads to 31 Oct 2026)</a> · <a href="https://takeuforward.org/community/interview-experiences/amazon-sde-2-oa-assessment-experience-rejected">TakeUForward, first-hand SDE II</a> · <a href="https://igotanoffer.com/en/advice/amazon-online-assessment">IGotAnOffer (updated 2 Oct 2026)</a></p>
+      </div>
+      <div class="card">
+        <h3>Scoring — what counts</h3>
+        <ul>
+          <li><strong>Hidden tests dominate.</strong> HackerRank scores by test cases passed, including hidden ones — so <strong>partial credit is real</strong>, and a brute force passing some cases beats nothing.</li>
+          <li><strong>Samples prove almost nothing</strong> (2 only). Always self-test: empty/minimum input, single element, duplicates, already-sorted / reverse, max-size shape, negative/zero if allowed.</li>
+          <li><strong>Efficiency matters twice:</strong> slow code fails hidden cases on time limits, and Amazon states optimised solutions earn more than brute force. <span class="tag off">Official</span></li>
+          <li><strong>No complexity essay needed.</strong> There's no interviewer and no reported free-text complexity question — scoring is test-case based. Clean names and a one-line comment on a non-obvious invariant are cheap insurance; don't burn timed minutes on more.</li>
+          <li><strong>No published pass mark.</strong> Any “% needed to pass” figure on a prep site is anecdotal / unverified — see §8.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Patterns that keep appearing (2025–2026 reports, convergent)</h3>
+    <p>Problems are usually wrapped in a logistics story — warehouse / delivery / grid placement, merging shipments, server rates, inventory, returns — but underneath it's a standard pattern. The skill is stripping the story: rewrite inputs/outputs plainly, note constraints, name the pattern before coding. Long statements + large constraints signal the intended solution is O(n log n) or O(n), not O(n²).</p>
+    <ol>
+      <li><strong>Arrays / strings + hash map/set counting</strong> — frequency maps, grouping, dedup, subarray/substring conditions.</li>
+      <li><strong>Sliding window + two pointers</strong> — longest/shortest substring or subarray under a constraint; container/pair problems.</li>
+      <li><strong>Prefix sums + binary search</strong> — including binary-search-on-answer / partitioning an array to minimise the largest part.</li>
+      <li><strong>Greedy + sorting / intervals</strong> — merge/sweep intervals, scheduling, lexicographically-best construction; monotonic stack in some reports.</li>
+      <li><strong>Graphs / grids: BFS, DFS, multi-source BFS</strong> — shortest steps, spread/rotting-style propagation, connected components.</li>
+      <li><strong>Heaps / priority queues</strong> — top-K, merging, streaming extremes.</li>
+      <li><strong>Modest DP</strong> — 1-D partition / string DP, knapsack-like or job-scheduling DP.</li>
+      <li><strong>Simulation / rates</strong> — process events in order exactly as specified; careful reading beats cleverness.</li>
+    </ol>
+    <p class="src">Sources: <a href="https://www.calibrd.com/interview-prep/amazon-interview">Calibrd (checked Oct 2026)</a> · <a href="https://www.praxisai.site/guides/amazon-ai-assisted-online-assessment">PraxisAI (updated 5 Nov 2026)</a>. Note: topic-frequency percentages on some blogs (e.g. “arrays 76%”) are unverifiable scraping estimates — the research did not treat them as data.</p>
+
+    <div class="card">
+      <h3>Your 40-minute Q1 workflow</h3>
+      <p style="margin:0"><strong>0–5</strong> Read, restate, note constraints, brute force in your head &nbsp;·&nbsp; <strong>5–10</strong> Pick the pattern, sanity-check on the sample by hand &nbsp;·&nbsp; <strong>10–30</strong> Code the optimal-or-better version &nbsp;·&nbsp; <strong>30–35</strong> Run samples + your own edge cases, fix &nbsp;·&nbsp; <strong>35–40</strong> Optimise the obvious bottleneck — or lock in the best partial-credit version, Save &amp; Proceed, and don't look back.</p>
+    </div>
+
+    <h3>JavaScript traps to fix tonight</h3>
+    <ul>
+      <li><code>Array.sort()</code> is <strong>lexicographic</strong> without a comparator — always <code>(a, b) =&gt; a - b</code> for numbers.</li>
+      <li><strong>No built-in heap or deque in JS.</strong> Write a minimal MinHeap class once tonight; for BFS use a queue with an index pointer — don't <code>shift()</code>/<code>slice</code> a queue on large inputs.</li>
+      <li>Know <code>Map</code>/<code>Set</code> iteration cold; remember string immutability costs on repeated concatenation.</li>
+    </ul>
+
+    <h3>The Q1 prompt kit — for tonight's practice, not the test</h3>
+    <p>Q1 has <strong>no AI assistant</strong> — outside AI in Q1 is prohibited and monitored (see §7), so there are no prompts to use <em>during</em> Q1. What a prompt kit can do for Q1 is make tonight's drills sharper: use the first six with any chat AI <em>before</em> the sitting to generate problems, ration hints, and review your attempts without being handed solutions. The last three aren't AI prompts at all — they're the questions to ask <em>yourself</em>, in order, inside the test. Rehearse them tonight until they're automatic.</p>
+
+    <div class="prompt">
+      <div class="when">Tonight · Generate a drill problem</div>
+      <div class="txt">“Give me one LeetCode Medium problem that uses [pattern, e.g. sliding window]. Problem statement and constraints only — no hints, no approach, no code. I'll solve it timed in JavaScript.”</div>
+      <div class="why">Keeps the rep honest: you practise pattern recognition and coding under the clock, not reading a walkthrough. Rotate the pattern across the §6 practice list.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">Tonight · Hint ladder, when stuck in practice</div>
+      <div class="txt">“I'm stuck on this problem after 15 minutes: [paste the statement]. Give me exactly one hint — the pattern name and the key observation — no code and no full solution.”</div>
+      <div class="why">One rung at a time. If the first hint doesn't unblock you in 5 minutes, ask for one more rung — never jump straight to the editorial, or the rep teaches you nothing.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">Tonight · Review a finished attempt</div>
+      <div class="txt">“Here is the problem and my JavaScript solution: [paste both]. Don't rewrite it. Tell me: (1) is it correct — name a specific input that breaks it, if one exists; (2) its time and space complexity; (3) the single biggest inefficiency.”</div>
+      <div class="why">The post-rep review that matters: a breaking input teaches more than a model solution. Fix the flaw yourself first, then compare approaches if you want.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">Tonight · Build your edge-case list</div>
+      <div class="txt">“For this problem — [paste the statement] — list the edge cases I should test before submitting: minimum or empty input, single element, duplicates, already sorted, reverse sorted, maximum-size input, and any boundary values the constraints allow.”</div>
+      <div class="why">Hidden tests are where Q1 is won or lost, and they're mostly edge cases. Run this once per practice type tonight and you'll start generating the list unaided.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">Tonight · Learn a pattern cold</div>
+      <div class="txt">“Teach me the [pattern, e.g. binary search on the answer] template for JavaScript: when it applies, the invariant it maintains, and a minimal skeleton I can type from memory. Then give me one small example to trace by hand.”</div>
+      <div class="why">Directly feeds the readiness checker's “templates from memory” box. Close the chat afterwards and re-type the skeleton from memory — that's the actual test of whether it stuck.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">Tonight · Sharpen the complexity reflex</div>
+      <div class="txt">“For this problem — [paste the statement] — state the brute-force complexity and the best achievable complexity, numbers only (e.g. ‘brute force O(n²), optimal O(n log n)’). Don't describe the optimal algorithm.”</div>
+      <div class="why">Trains the move you'll make at minute 2 of the real Q1: read the constraints, derive the target complexity, and let that pick the pattern — without spoiling the problem during drills.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">In the test · Minutes 0–5, ask yourself</div>
+      <div class="txt">“What are the inputs and the exact output? What do the constraints rule out? Which pattern is this — hash map, sliding window, prefix sums, binary search, greedy/intervals, BFS/DFS, heap, or modest DP? What does the brute force look like, and where exactly does it waste work?”</div>
+      <div class="why">Your recognition checklist — no AI involved, just the four questions that turn a wall of story text into a named pattern before you write a line. Say them in this order, every time.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">In the test · Stuck around minute 20, ask yourself</div>
+      <div class="txt">“What simpler version passes most tests? Lock in the brute force — or the sort-based O(n log n) version — run the samples now, and only optimise with whatever time is left.”</div>
+      <div class="why">Partial credit is real and hidden tests dominate, but zero passing code scores zero. A working suboptimal solution on the board beats an optimal one that exists only in your head at minute 40.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">In the test · Final 5 minutes, ask yourself</div>
+      <div class="txt">“Have I tested minimum/empty input, a single element, duplicates, and a maximum-size shape? Am I returning the value (not console.log)? Are there debug prints to remove? Is the numeric sort using (a, b) =&gt; a - b?”</div>
+      <div class="why">The pre-submit sweep, built from the scoring notes and JS traps above. Two minutes here routinely saves more test cases than two more minutes of optimising.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="warn"><strong>Boundary, stated plainly:</strong> prompts 1–6 are for preparation only — tonight, in a separate tool, on practice problems. In the real sitting, Q1 is unaided: no chat AI, no second device, no outside resources (§7). Prompts 7–9 are deliberately self-prompts — questions you run in your own head — because that's the only “assistant” Q1 allows. The AI assistant exists only in Q2, which is what the §3 kit is for.</div>
+
+    <h3>Full-solve prompts — get a complete, worked solution</h3>
+    <p>When you want the whole question solved end-to-end — not a hint — use these two on <strong>practice problems tonight, in a separate AI tool outside the assessment</strong>. The workflow that makes them useful: attempt the problem timed and unaided first, then run the matching prompt, compare its solution to yours line by line, and re-type the corrected version from memory. That turns a full solution into pattern fluency instead of just an answer you read once.</p>
+
+    <div class="prompt">
+      <div class="when">Practice only · Q1 — full solve</div>
+      <div class="txt">“Solve this problem completely in JavaScript (Node.js): [paste the full problem statement, constraints, function signature, and sample input/output]. Do not give hints or a partial approach — give the finished solution. Provide: (1) a 2–3 sentence restatement of what is being asked, stripped of the story; (2) the pattern you are using and why the constraints require it; (3) complete, runnable code with no placeholders or TODOs — return the value (do not rely on console.log for the answer), use (a, b) =&gt; a - b for numeric sorting, and handle empty/minimum input, a single element, duplicates, and maximum-size input; (4) time and space complexity; (5) a step-by-step walkthrough on the sample; and (6) at least 6 test cases — the samples plus edge cases — with the expected output for each and a check that your code produces it. If the brute force differs from the optimal solution, show the optimal one only.”</div>
+      <div class="why">One paste, one complete answer: code you can run as-is, the reasoning behind it, and a test set that proves it — including the edge cases hidden tests usually target. Replace the bracketed part with the whole practice problem, signature included, or the code may not match the expected function shape.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">Practice only · Q2 repo task — full solve</div>
+      <div class="txt">“Solve this practice repo task completely. README / ticket: [paste it]. Failing tests and exact error output: [paste them]. Relevant files: [paste each file, labelled with its file name]. Give the finished fix, not hints: (1) for every bug, name the file and function, state the root cause in one line, and show the exact corrected code for that function or block — complete enough that I can apply it verbatim, with no placeholders; (2) if a whole file needs replacing, give the complete corrected file; (3) do not change the README, the tests, or any existing element IDs/classes; (4) check the fix against every rule in the README — required-field validation returning 400 (not 500), 404 for missing records, 401/403 where permission applies, changes actually saved/persisted, and the correct status code and response field names; and (5) finish with a checklist mapping each failing test to the change that makes it pass, plus any remaining edge case — duplicates, empty or missing fields, wrong user — that could still fail. ”</div>
+      <div class="why">Built for a practice repo drill: paste the ticket, the failing output, and the handler files, and you get an apply-ready fix per file plus a test-by-test checklist to verify against when you Run Tests. It only works if you paste the actual files — without them, any AI can only guess at the codebase.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="warn"><strong>Use these outside the sitting only.</strong> In the live assessment they won't do what they do in practice: Q1 permits no outside AI at all (§7), and Q2's built-in assistant is documented to give guidance “without providing the full solution” — it will decline a request like prompt 2, and the transcript is visible to your evaluator (§3). In the real Q2, fall back to the §3 kit: locate, trace, and narrow one bug at a time, and write every fix yourself.</div>
+  </section>
+
+  <!-- Q2 -->
+  <section id="q2">
+    <h2>3 · Q2 — Repo + AI assistant (your edge, if you pick Node)</h2>
+    <p class="lede">A throughput test, not an algorithms test. Candidates who lose do so by reading the whole codebase, picking an unfamiliar stack, or running out of clock — not because a bug was deep. <span class="tag rep">Reported</span></p>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>What it actually is</h3>
+        <ul>
+          <li>Small multi-file web app in a full browser VS Code IDE. <strong>The README is the contract.</strong> HackerRank's own examples: a React app or Express server; tasks like “fix a bug on the Customer dashboard” or “add a feature to check whether Express delivery is available.” <span class="tag off">Official</span></li>
+          <li>A short ticket names <strong>2–4 broken behaviours</strong>; the suite has <strong>~6 tests</strong> (reports range 3–8). Sometimes there's <strong>one bug not in the ticket</strong>, found only by reading failing tests.</li>
+          <li>Mostly <strong>bug-fixing</strong>; some tasks are feature-building / finishing a missing piece. Domains rotate (watchlist, issue tracker, wallet, loans, car rental, blog, returns) — irrelevant; the handler shape is constant.</li>
+        </ul>
+        <p class="src">Sources: <a href="https://candidatesupport.hackerrank.com/articles/1494260168-preparing-for-your-amazon-oa">HackerRank</a> · <a href="https://nyrion.ai/companies/amazon">Nyrion</a> · <a href="https://bugnik.com/guides/amazon-oa-code-repository-question">Bugnik (22 Oct 2026)</a></p>
+      </div>
+      <div class="card">
+        <h3>The bugs are shallow handler bugs</h3>
+        <ul>
+          <li>Missing validation → <strong>500 instead of 400</strong></li>
+          <li>Missing existence check → <strong>no 404</strong></li>
+          <li>Mutate-but-never-save (missing save/update call)</li>
+          <li>Wrong route/path or method registration</li>
+          <li>Wrong status code or response shape / field name</li>
+          <li>Duplicate check comparing the wrong type or field</li>
+          <li>Search filter missing, case-sensitive search, wrong sort direction</li>
+          <li>Frontend showing the wrong user's / wrong filtered data because the API/query is wrong — <strong>fix the API layer first</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="warn"><strong>Pick Node.js.</strong> Reported stack options include Node.js (MERN / Express + MongoDB), Java + Spring Boot, Python + Django, and C++ in at least some reports (Flask in one synthesis) — lists vary by role/cycle, so <strong>the list in your invite/demo is the only authoritative one</strong>. <span class="tag off">Official</span> on the lock: you select the framework <em>before</em> starting and <strong>cannot switch once the test starts</strong>. Candidates who picked Spring Boot without daily Spring fluency report losing most of the hour to framework friction and finishing 2/6. Pick the stack you can read and debug blind. <span class="src">Sources: <a href="https://candidatesupport.hackerrank.com/articles/1494260168-preparing-for-your-amazon-oa">HackerRank</a> · <a href="https://bugnik.com/guides/amazon-oa-code-repository-question">Bugnik</a> · <a href="https://nyrion.ai/companies/amazon">Nyrion</a></span></div>
+
+    <h3>The AI assistant — a librarian, not a fixer</h3>
+    <div class="grid2">
+      <div class="card">
+        <h3>What it does <span class="tag off">Official</span></h3>
+        <ul>
+          <li>Built into the repo IDE. Gives “contextual and coding guidance, <strong>without providing the full solution</strong>.”</li>
+          <li>Can explain the codebase, point to where a change belongs, help debug errors you paste in, and suggest syntax/templates you can Apply at the cursor.</li>
+          <li><strong>Optional; you won't be penalised for using it, and interactions are not considered in your score — but the conversation is recorded and the transcript is visible to your evaluator.</strong> Write prompts as if a hiring manager will read them, because one may.</li>
+          <li><strong>Repo-only.</strong> GenAI is not permitted in Q1.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>What candidates report <span class="tag rep">Reported</span></h3>
+        <ul>
+          <li>It will say which file handles a route, explain a block, say what a test checks. Ask it to fix the bug or edit the file and it <strong>usually declines</strong>; narrow questions about one specific error occasionally yielded a hint.</li>
+          <li>Some found it slow, misleading, or limited to the open file. <strong>Verify everything it says by running tests.</strong></li>
+          <li>Don't confuse it with HackerRank's newer interview product where an agent <em>can</em> edit files — that's a different configuration. <strong>Plan to write every fix yourself.</strong></li>
+        </ul>
+        <p class="src">Sources: <a href="https://nyrion.ai/companies/amazon">Nyrion</a> · <a href="https://takeuforward.org/community/interview-experiences/amazon-sde-2-oa-assessment-experience-rejected">TakeUForward</a></p>
+      </div>
+    </div>
+    <p><strong>Prompting rules:</strong> ask <em>where / what / why-this-error</em>, never “fix it” · paste the exact error + failing test name · one file/function at a time · never wait on it — keep tracing while it answers · never Apply a suggestion you don't understand.</p>
+
+    <h3>The Q2 prompt kit — copy-ready, in the order you'll use them</h3>
+    <p>Twelve prompts covering the whole hour. Replace the <code>[bracketed]</code> parts with your actual file, route, or test name — specificity is what makes the assistant useful; vague prompts get vague answers. Each one is deliberately framed as <em>where / what / why</em>, because that's what the assistant answers well, and because a transcript full of “explain this / locate that” reads like a senior engineer working — which matters, since the evaluator can see it. Tap <strong>Copy</strong> to grab a prompt for your practice drill tonight; in the real test, type or paste them into the AI panel.</p>
+
+    <div class="prompt">
+      <div class="when">Minute 0–5 · Orientation</div>
+      <div class="txt">“Give me a quick map of this codebase: which files handle routing, request handling, data storage, and validation? Keep it to file names and one line each.”</div>
+      <div class="why">Your first move alongside reading the README. Gets you the lay of the land in one answer instead of opening every file.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">Minute 0–5 · Orientation</div>
+      <div class="txt">“According to the README, what are the exact expected behaviours for [feature, e.g. creating an item] — required fields, status codes, and error cases?”</div>
+      <div class="why">The README is the contract. This pins the expected behaviour before you look at any code, so you can spot where the code disagrees with it.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">After first Run Tests · Triage</div>
+      <div class="txt">“These tests are failing: [paste the failing test names]. For each one, which route and which file/function is it most likely exercising?”</div>
+      <div class="why">Turns a wall of red tests into a worklist with locations. This is the single highest-value prompt in the kit — it converts test output into a map.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">Per failing test · Understand the test</div>
+      <div class="txt">“What exactly does the test ‘[test name]’ check? Walk me through the request it sends and the response it expects, step by step.”</div>
+      <div class="why">Never fix against a test you haven't understood. The expected status code and response shape in the test tell you what “correct” is.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">Per bug · Locate it</div>
+      <div class="txt">“Trace the request flow for [method + route, e.g. POST /items]: which files and functions does it pass through, in order, from the route definition to the data layer?”</div>
+      <div class="why">Gives you the exact chain to walk — route → handler → service → model — instead of hunting through folders under time pressure.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">Per bug · Narrow the cause</div>
+      <div class="txt">“The test expects a [expected status, e.g. 400] when [condition, e.g. the name field is missing], but the API returns [actual status, e.g. 500]. Where in the handler for [route] should that validation happen, and what check is missing?”</div>
+      <div class="why">The workhorse prompt. Expected-vs-actual plus the route is exactly the framing that gets a precise, usable answer — and it matches the shallow-bug pattern (missing validation, missing 404, forgotten save).</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">When you hit an error · Debug</div>
+      <div class="txt">“I'm getting this error: [paste the exact error message and stack trace]. Which line in [file] is causing it, and why?”</div>
+      <div class="why">Always paste the real error — never paraphrase it. The assistant is good at reading stack traces; it's poor at guessing from a summary.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">Reading unfamiliar code · Explain</div>
+      <div class="txt">“Explain what [function name] in [file] does, line by line. In particular: does it save/persist the change it makes, and what does it return?”</div>
+      <div class="why">The mutate-but-never-save bug hides inside functions that look fine at a glance. Asking explicitly about persistence and return value surfaces it fast.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">Syntax / framework gaps · Unblock</div>
+      <div class="txt">“What's the correct Express syntax for [the thing you're doing, e.g. reading a route parameter / sending a 404 JSON response]? Just the pattern, briefly.”</div>
+      <div class="why">Legitimate use of the assistant: it will supply syntax and templates. Asking for the pattern — not the fix — keeps you moving without burning minutes on docs you can't open.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">After each fix · Verify</div>
+      <div class="txt">“I changed [file] so that [one-line description of your fix]. Which other behaviours or tests could that change affect?”</div>
+      <div class="why">A cheap regression check before you re-run. Then Run Tests anyway — the assistant's opinion never substitutes for a green suite.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">Minute 45+ · Hunt the unlisted bug</div>
+      <div class="txt">“All the ticket's tests pass now. Based on the README rules, which edge cases are most likely to still be broken — empty or missing fields, duplicates, wrong user, wrong status codes?”</div>
+      <div class="why">For the final sweep. Reports say there's sometimes one bug not named in the ticket; this prompts a checklist to test against the README yourself.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="prompt">
+      <div class="when">Stuck past ~10 min on one bug · Reframe</div>
+      <div class="txt">“I'm stuck on ‘[test name]’. The test sends [request] and expects [expected], but gets [actual]. What are the three most likely causes, in order, and how would I check each one?”</div>
+      <div class="why">Your escape hatch. A ranked list of hypotheses with checks beats one confident guess — work down the list, testing each, instead of deep-diving the first idea.</div>
+      <button type="button" class="copybtn" data-copy>Copy prompt</button>
+    </div>
+
+    <div class="warn"><strong>What not to ask:</strong> “Fix this bug,” “Write the code for…,” or pasting a whole file and asking what's wrong with it. Candidates report the assistant usually declines to write fixes — so you lose clock time <em>and</em> the transcript shows you asking for the solution instead of the reasoning. If it declines or gives you something vague, don't argue with it: narrow the question to one file, one error, one expected-vs-actual pair (prompt 6), and keep tracing the code yourself while it answers. <strong>Every fix is yours to write; the assistant is for orientation, location, and explanation only.</strong></div>
+
+    <div class="flow">
+      <h3 style="color:#fff;margin-bottom:6px">The 60-minute Q2 workflow</h3>
+      <ol>
+        <li><code>0–5</code> &nbsp;Read the README fully. <strong>Run Tests before touching code.</strong> Failing test names are your map.</li>
+        <li><code>5–10</code> &nbsp;If it doesn't build/install, fix that first. Ask the assistant only for orientation: “Which file/route handles X?”</li>
+        <li><code>10–45</code> &nbsp;One failing test at a time: read the test → trace route → handler → service → model/helper → find the line that disagrees with the README → <strong>smallest possible fix</strong> → Run <em>all</em> tests.</li>
+        <li><code>45–55</code> &nbsp;Green? Re-read the README rules; check boundaries, empty/missing fields, duplicates, wrong-user, error codes. Hunt the unlisted bug.</li>
+        <li><code>55–60</code> &nbsp;Final full Run Tests. Confirm the last change saved. Submit.</li>
+      </ol>
+      <p style="margin-bottom:0"><strong>Pace check:</strong> ~10 minutes per bug/test. At minute 30 with 0–1 tests green, stop deep-diving and triage the cheapest-looking failures first. Partial credit is real here — reports include candidates advancing at 4–5 of 6. <span class="tag rep">Reported</span></p>
+    </div>
+
+    <div class="card">
+      <h3>Handler shape to rehearse (Node/Express)</h3>
+      <p style="margin-top:0">Route → <strong>validate</strong> → <strong>lookup / 404</strong> → <strong>auth / permission</strong> → <strong>mutate</strong> → <strong>save</strong> → <strong>status / shape</strong>. Status codes to know cold: 200 · 201 · 400 · 401 · 403 · 404 · 500.</p>
+      <pre><code>// The shape most Q2 bugs break somewhere along:
+validate body        → 400, not 500
+lookup missing       → 404
+permission missing   → 401 / 403
+mutate, then SAVE    → the step most often dropped
+respond              → right status + right field names</code></pre>
+    </div>
+  </section>
+
+  <!-- SIM -->
+  <section id="sim">
+    <h2>4 · Work Simulation (~15 min on the label)</h2>
+    <p class="lede">Scored against Amazon's 16 Leadership Principles. Multiple reports show rejection after passing all repo tests — do not click through this section. <span class="tag rep">Reported</span></p>
+    <div class="card">
+      <h3>What it looks like</h3>
+      <ul>
+        <li>A simulated day in the role: emails, videos and chat messages from virtual managers/teammates, plus supporting materials (wikis, code snippets, roadmaps). For each scenario you <strong>rate 4–5 possible responses for effectiveness, or pick the best one</strong>. Amazon says to actually open the work materials before rating. <span class="tag off">Official</span> (via summaries of amazon.jobs)</li>
+        <li>Reports matching your invite's timing describe a shorter, decision-focused version — e.g. <strong>3 scenarios, ~8 tasks</strong>, each action rated on a 5-step effectiveness scale, plus occasional priority ratings (Low / High / Essential).</li>
+        <li><strong>Timing warning:</strong> several candidates say the quoted 15 minutes understated reality — one needed ~40. <strong>Block 30–45 minutes of your sitting for it</strong>, and check the rating-scale direction before your first answer — one report warns it's easy to read backwards. <span class="tag con">Conflict</span></li>
+      </ul>
+      <p class="src">Sources: <a href="https://www.vervecopilot.com/hot-blogs/amazon-online-assessment-design">Verve (summarising amazon.jobs)</a> · <a href="https://ophyai.com/amazon-oa">OphyAI (checked 3 Nov 2026)</a> · <a href="https://aceoffer.app/interviews/amazon/interview-process">AceOffer (198 reports, Oct 2025–Nov 2026)</a></p>
+      <p style="margin-bottom:0"><strong>Scoring:</strong> Amazon does not publish the rubric. Secondary sources describe an expert-model key (most-effective = full marks, least = zero, in-between = partial) — plausible but unverified. What's official: the simulation measures Leadership Principles.</p>
+    </div>
+
+    <h3>The trade-offs — what rates high vs low</h3>
+    <table>
+      <thead><tr><th>Dilemma</th><th>Rates high</th><th>Rates low</th></tr></thead>
+      <tbody>
+        <tr><td data-h="Dilemma"><strong>Deadline slips / dependency late</strong></td><td data-h="Rates high" class="good">Own it early: tell manager/PM promptly <em>with</em> impact, options (de-scope, feature-flag, phased rollout) and a revised plan; protect the customer launch.</td><td data-h="Rates low" class="bad">Hide it and hope; surprise stakeholders at the deadline; escalate to senior leadership demanding the other team re-prioritise.</td></tr>
+        <tr><td data-h="Dilemma"><strong>Deadline vs quality</strong></td><td data-h="Rates high" class="good">Ship the safe subset on time; flag/gate the risky part; document the trade-off. Disagree and commit once decided.</td><td data-h="Rates low" class="bad">Ship known-broken code to hit the date; cut a correctness/security corner silently; refuse to commit after losing the argument.</td></tr>
+        <tr><td data-h="Dilemma"><strong>Own vs escalate</strong></td><td data-h="Rates high" class="good">Handle what's within your scope yourself; escalate <em>with data, a recommendation, and what you've already tried</em> when it's genuinely above scope.</td><td data-h="Rates low" class="bad">Escalate a decision that's yours for a manager/VP to make (fails Ownership — repeatedly flagged); never escalate anything, even a customer/legal risk.</td></tr>
+        <tr><td data-h="Dilemma"><strong>Data vs anecdote</strong></td><td data-h="Rates high" class="good">Dive Deep: check the dashboard/logs/code/wiki <em>in the scenario materials</em> first; if metrics and anecdote differ, investigate both; decide on best available data when time is short.</td><td data-h="Rates low" class="bad">Decide on gut / one anecdote / loudest voice; or analysis-paralysis — demanding perfect data while a customer issue burns (fails Bias for Action).</td></tr>
+        <tr><td data-h="Dilemma"><strong>Customer issue</strong></td><td data-h="Rates high" class="good">Mitigate customer impact now, root-cause second, follow up in writing; long-term fix over short-term optics.</td><td data-h="Rates low" class="bad">Blame another team or the customer; prioritise internal convenience or a metric over clear customer harm.</td></tr>
+        <tr><td data-h="Dilemma"><strong>Disagreement / bad plan</strong></td><td data-h="Rates high" class="good">Have Backbone: raise it directly, with data, to the decision-maker; propose an alternative; then commit.</td><td data-h="Rates low" class="bad">Stay silent to keep the peace; go around the person; agree publicly, undermine privately.</td></tr>
+        <tr><td data-h="Dilemma"><strong>Ambiguous task</strong></td><td data-h="Rates high" class="good">Ask clarifying questions <em>and</em> propose a plan in parallel; go to the owner directly; make assumptions explicit.</td><td data-h="Rates low" class="bad">Wait passively for perfect instructions; guess silently on a high-blast-radius change; broadcast to everyone.</td></tr>
+        <tr><td data-h="Dilemma"><strong>Teammate underperforming / conflict</strong></td><td data-h="Rates high" class="good">Address it directly, promptly, privately, with specifics and support; involve the manager with facts if it persists.</td><td data-h="Rates low" class="bad">Ignore it; complain to peers; criticise publicly; silently do their work forever.</td></tr>
+      </tbody>
+    </table>
+    <div class="note"><strong>The heuristic that covers most items:</strong> rate highest the option that (1) protects the customer, (2) is owned by <em>you</em>, (3) acts promptly, (4) uses the data/materials given, and (5) communicates early and in writing. Rate lowest anything that hides, blames, defers ownership upward, cuts a hidden corner, or waits.</div>
+
+    <h3>Leadership Principles most in play here</h3>
+    <p>All 16 can appear and no source credibly shows a weighting — don't study a shortlist only. In SDE decision scenarios these recur most: <strong>Customer Obsession, Ownership, Bias for Action, Dive Deep, Are Right A Lot, Earn Trust, Have Backbone; Disagree and Commit, Insist on the Highest Standards, Deliver Results, Invent and Simplify, Think Big.</strong> The full official 16:</p>
+    <ol class="lp">
+      <li>Customer Obsession</li><li>Ownership</li><li>Invent and Simplify</li><li>Are Right, A Lot</li>
+      <li>Learn and Be Curious</li><li>Hire and Develop the Best</li><li>Insist on the Highest Standards</li><li>Think Big</li>
+      <li>Bias for Action</li><li>Frugality</li><li>Earn Trust</li><li>Dive Deep</li>
+      <li>Have Backbone; Disagree and Commit</li><li>Deliver Results</li><li>Strive to be Earth's Best Employer</li><li>Success and Scale Bring Broad Responsibility</li>
+    </ol>
+    <p class="src">Any source listing 14 principles is pre-July 2021 and outdated.</p>
+  </section>
+
+  <!-- SURVEYS -->
+  <section id="surveys">
+    <h2>5 · Work Style Surveys (~10 min on the label — two surveys)</h2>
+    <p class="lede">Profile fit, not knowledge. The real risk isn't a “wrong” answer — it's an inconsistent one.</p>
+    <div class="grid2">
+      <div class="card">
+        <h3>What they are <span class="tag rep">Reported</span></h3>
+        <ul>
+          <li>Forced-choice / rating items built around the 16 Leadership Principles. Typical format: two statements side by side — pick which is more like you, on a “Most like me / More like me” scale with <strong>no neutral middle</strong>; some versions use Likert ratings.</li>
+          <li>Example of the <em>kind</em> of pair (from prep guides, not a leaked item): “I like things clearly structured” vs “I look forward to learning new things.”</li>
+          <li>Your “two surveys” matches July 2026 reports of ~15 single-answer items + ~35 forced-choice pairs — which took that candidate <strong>25–30 minutes</strong> despite a ~10-minute quote. Budget more time than the label.</li>
+          <li>Amazon's own line (via summaries): Workstyles needs no practice — answer as the authentic you, don't overthink.</li>
+        </ul>
+        <p class="src">Sources: <a href="https://igotanoffer.com/en/advice/amazon-online-assessment">IGotAnOffer</a> · Inbyte prep guide (updated 1 Nov 2026, as cited in the research report).</p>
+      </div>
+      <div class="card">
+        <h3>Honest, but strategic</h3>
+        <ul>
+          <li><strong>Are there “right” answers?</strong> Not per item — pairs often pit two desirable traits against each other. But there <em>is</em> a coherent vs incoherent profile: scoring reportedly compares your pattern to LP-aligned profiles. Claims of a secret answer key are prep-site marketing — <strong>unverified</strong>.</li>
+          <li><strong>Consistency traps:</strong> the same trait returns reworded, paired against different alternatives. Endorsing both “I decide fast on available data” and later “I always wait for complete data” as <em>most</em> like you — or maxing the flattering extreme on everything — produces detectable contradictions. (The exact penalty is unknown; Amazon doesn't publish the algorithm.)</li>
+          <li><strong>Approach:</strong> read the 16 LPs once tonight so the vocabulary isn't new → answer as <em>yourself at work on a good day</em> → first instinct, a few seconds per item → when two good traits collide, pick the one that's truly more characteristic of you → keep a steady pace, don't reverse your philosophy halfway through.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- READINESS -->
+  <section id="ready">
+    <h2>6 · Readiness for tomorrow — the decision + the plan</h2>
+    <p class="lede">Your edge: Q2 in Node is your day job, and the Work Simulation rewards senior judgement you already exercise. Your gap: Q1 pattern-recognition <em>speed</em> in vanilla JS under a 40-minute clock. So tonight is not “learn DP” — it's demo fluency, pattern templates, one timed repo drill, and an LP skim. In that order.</p>
+
+    <div class="scorer" aria-label="Readiness checker">
+      <h3>Readiness checker — tap each one you can honestly say yes to <em>after tonight's practice</em></h3>
+      <p class="src" style="margin-top:0">This runs only in this page, in this session — nothing is saved or sent anywhere. It's a self-test, not a submission.</p>
+      <button type="button" class="crit" data-crit><span class="dot" aria-hidden="true"></span><span><strong>Demo done for both formats.</strong> I know where Run Tests, the AI panel and Submit are, and I've confirmed Node.js as my repo choice.</span></button>
+      <button type="button" class="crit" data-crit><span class="dot" aria-hidden="true"></span><span><strong>Two timed Mediums attempted.</strong> At least one fully passing (samples + my own edge cases) within 40 min, and the other at least a correct brute-force / majority-of-cases solution within 40 min.</span></button>
+      <button type="button" class="crit" data-crit><span class="dot" aria-hidden="true"></span><span><strong>Repo drill passed.</strong> 3+ bugs fixed from test failures within ~45–60 min, without needing framework documentation.</span></button>
+      <button type="button" class="crit" data-crit><span class="dot" aria-hidden="true"></span><span><strong>Templates from memory.</strong> I can type the P0 patterns in JS without looking them up — hash/sliding window, BFS, sort-merge — including the numeric sort comparator.</span></button>
+      <button type="button" class="crit" data-crit><span class="dot" aria-hidden="true"></span><span><strong>Setup + rest.</strong> I'm rested and healthy, with a quiet single-monitor setup secured for the full uninterrupted sitting and no foreseeable interruption.</span></button>
+      <div id="verdictOut" role="status" aria-live="polite"></div>
+    </div>
+
+    <h3>Wait instead if <em>any</em> of these is true</h3>
+    <ul class="checklist wait">
+      <li><span class="box"></span><span>You haven't run the demo, or its IDE / framework selection confused you for more than ~15 minutes.</span></li>
+      <li><span class="box"></span><span>Both timed Mediums timed out with no working solution — 3–4 days of pattern reps is the highest-value intervention available, far larger than any day-1 advantage.</span></li>
+      <li><span class="box"></span><span>The repo drill showed you can't trace an Express request flow, or don't know the 400 / 404 / save / status basics in Node — fixable in 1–2 evenings, fatal if discovered in the real Q2.</span></li>
+      <li><span class="box"></span><span>You're ill, severely sleep-deprived, travelling, or can't secure a quiet single-monitor block — the timer keeps running through outages, so a disrupted sitting is worse than a later clean one.</span></li>
+      <li><span class="box"></span><span>You were counting on outside resources/AI in Q1 — that plan is both prohibited and monitored (see §7). Rebuild the plan around unaided Q1 first.</span></li>
+    </ul>
+    <div class="note"><strong>The middle path (often optimal):</strong> if Q1 reps were borderline but the Q2 drill was strong, take <strong>2 extra days</strong> — Day A: 6–8 timed Mediums across P0/P1 only. Day B: one full mock (40-min Medium + 60-min repo drill back-to-back, no pause, no return to Q1) + LP re-read. Then sit on day 3–4, leaving buffer days before the the deadline deadline for a technical-issue contingency.</div>
+
+    <h3>Step 1 tonight: use the official demo properly (~35 min)</h3>
+    <p>The Amazon practice test has <strong>2 questions, is not scored, and does not affect the outcome</strong>; the sample coding challenge can be repeated. HackerRank “strongly recommends” the sample test before you begin. <span class="tag off">Official</span> Treat it as a systems check, not a knowledge test:</p>
+    <ol>
+      <li>Confirm your <strong>framework choice = Node.js</strong> and rehearse the exact selection step — it locks.</li>
+      <li><strong>Q1 demo:</strong> set language to JavaScript/Node; find Run, custom test input, Debug Output, Save &amp; Proceed. Type your sort/Map templates once to check autocomplete.</li>
+      <li><strong>Q2 demo:</strong> find the README, file explorer, terminal, <strong>Run Tests</strong>, preview, and the <strong>AI Assistant panel</strong>. Ask it an orientation question (“which file handles X?”) and watch how it limits a “write the fix” request — so the real behaviour isn't a surprise.</li>
+      <li>Confirm: timer display (100 total or 40/60 split on <em>your</em> landing page?), the cannot-go-back warning, webcam/ID/system-check steps, single-monitor behaviour, and what final Submit/confirmation looks like.</li>
+      <li>Verify Chrome/Edge version, extensions disabled, cookies allowed, webcam/mic, ID ready, connection speed.</li>
+    </ol>
+    <p class="src">If the demo shows a stack list or timer that differs from your invite email, believe the demo/landing page for mechanics — and email the recruiter only if they directly contradict each other.</p>
+
+    <h3>Tonight's plan (~3.5–4 hrs max, then stop — sleep is a performance input)</h3>
+    <table>
+      <thead><tr><th>Block</th><th>Time</th><th>Do</th></tr></thead>
+      <tbody>
+        <tr><td data-h="Block"><strong>1</strong></td><td data-h="Time">35 min</td><td data-h="Do">Official demo/sample for <strong>both</strong> formats (checklist above). Write down the timer split + framework list.</td></tr>
+        <tr><td data-h="Block"><strong>2</strong></td><td data-h="Time">80 min</td><td data-h="Do"><strong>Timed Q1 reps:</strong> 2 × 40-min Mediums from the practice types below, in JS, no AI, no notes. Review <em>only</em> the pattern you missed after each — the §2 prompt kit's drill, hint, and review prompts are built for exactly this: generate the problem, ration hints, then get your attempt critiqued without being handed the solution.</td></tr>
+        <tr><td data-h="Block"><strong>3</strong></td><td data-h="Time">60 min</td><td data-h="Do"><strong>Repo drill:</strong> take a tiny Express app you didn't write (or a practice repo task), plant or find 3 bugs — remove a save, break a status code, drop a validation — then fix from failing tests in ≤45 min using the §3 workflow — and rehearse the §3 prompt kit against the drill's assistant (or any chat AI) so the phrasing is automatic tomorrow. No repo handy? Trace one open-source Express example route→handler→model on paper and rehearse the status-code table.</td></tr>
+        <tr><td data-h="Block"><strong>4</strong></td><td data-h="Time">25 min</td><td data-h="Do">Read the 16 Leadership Principles + the §4 trade-off table once. No story-writing — that's for the interview loop, not the OA.</td></tr>
+        <tr><td data-h="Block"><strong>5</strong></td><td data-h="Time">10 min</td><td data-h="Do">Logistics: ID out, charger in, wired connection if possible, second monitor disconnected <em>tonight</em>, quiet room booked, water, test time chosen. <strong>Stop. Sleep.</strong></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Priority checklist — in order, stop when time runs out</h3>
+    <ul class="checklist">
+      <li><span class="box"></span><span><span class="pri">P0</span> &nbsp;<strong>Hash map/set + sliding window + two pointers + prefix sums</strong> — templates you can type from memory in JS.</span></li>
+      <li><span class="box"></span><span><span class="pri">P0</span> &nbsp;<strong>Sorting + intervals/greedy</strong> — sort by start, sweep, merge; sort + two pointers.</span></li>
+      <li><span class="box"></span><span><span class="pri">P0</span> &nbsp;<strong>BFS/DFS on grid/array graph</strong> — directions array, visited set, queue with index pointer; multi-source BFS = seed all sources at distance 0.</span></li>
+      <li><span class="box"></span><span><span class="pri">P1</span> &nbsp;<strong>Binary search</strong> — classic + “smallest value such that feasible(x)” on-answer template.</span></li>
+      <li><span class="box"></span><span><span class="pri">P1</span> &nbsp;<strong>Stack</strong> (matching, monotonic-stack idea) and <strong>heap</strong> — write a minimal MinHeap class once; top-K pattern.</span></li>
+      <li><span class="box"></span><span><span class="pri">P1</span> &nbsp;<strong>Node/Express handler shape</strong> + status codes 200/201/400/401/403/404/500.</span></li>
+      <li><span class="box"></span><span><span class="pri">P2</span> &nbsp;<strong>1-D DP</strong> — climb/partition/min-cost recurrence shape, recognition only. Don't sink hours here.</span></li>
+      <li><span class="box"></span><span><strong>Skip tonight:</strong> advanced DP, Dijkstra/union-find deep dives, segment trees, complex string algorithms, system-design study.</span></li>
+    </ul>
+
+    <h3>Practice problem types — one of each, timed, in JS (generic types, not leaked questions)</h3>
+    <ol>
+      <li>Longest substring without repeating characters (sliding window + Map) — Medium</li>
+      <li>Two-sum / subarray-sum-equals-K family (hash map / prefix sum) — Easy/Medium</li>
+      <li>Merge intervals + meeting-rooms-style sweep (sort + greedy) — Medium</li>
+      <li>Grid BFS shortest path / rotting-spread multi-source BFS — Medium</li>
+      <li>Top-K frequent / K-closest (heap, or sort fallback) — Medium</li>
+      <li>Binary-search-on-answer: split-array / capacity-to-ship style — Medium</li>
+      <li>Container / pair with sorted two pointers — Medium</li>
+      <li>Valid parentheses + monotonic-stack “next greater” — Easy/Medium</li>
+      <li>A string/array 1-D DP partition or min-cost — Medium (stretch only)</li>
+    </ol>
+    <p>Breadth of first-recognition beats depth tonight: the win is naming the pattern in the first 5 minutes, not polishing one type.</p>
+
+    <h3>Tomorrow morning (only if GO)</h3>
+    <table>
+      <thead><tr><th>When</th><th>Do</th></tr></thead>
+      <tbody>
+        <tr><td data-h="When"><strong>Wake → T-2h</strong></td><td data-h="Do">Normal routine, food, <strong>no new topics</strong>.</td></tr>
+        <tr><td data-h="When"><strong>T-90 min</strong></td><td data-h="Do">20-min warm-up only: <em>re-type</em> (don't just read) the sliding-window, BFS, binary-search-on-answer and MinHeap skeletons in JS; re-read the Q2 handler sequence.</td></tr>
+        <tr><td data-h="When"><strong>T-60 min</strong></td><td data-h="Do">Light re-check: browser, extensions off, other apps/monitors off, webcam, ID, network. Close everything else.</td></tr>
+        <tr><td data-h="When"><strong>T-15 min</strong></td><td data-h="Do">Bathroom, water, notifications off. Re-read your one-line plans: Q1 hard-stop ~40 · Q2 README→tests first · Work Sim: check scale direction · Work Style: first-instinct + consistent.</td></tr>
+        <tr><td data-h="When"><strong>Start</strong></td><td data-h="Do">Start only when you can give the <em>full</em> sitting uninterrupted (~2–2.5 hrs elapsed, allowing the simulation/surveys to overrun their labels). Don't click “Start My Assessment” before that moment.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- RULES -->
+  <section id="rules">
+    <h2>7 · Rules, proctoring &amp; logistics</h2>
+    <p class="lede">Your invite controls. Assume the strictest reading — proctoring is configured per requisition, and Amazon doesn't publish which add-ons are on for yours.</p>
+    <div class="grid2">
+      <div class="card">
+        <h3>What's tracked</h3>
+        <ul>
+          <li><strong>Amazon (official, via summaries):</strong> browser usage is <strong>logged</strong> during coding; <strong>using Print Screen may terminate your session / lock you out</strong>; avoid copy-pasting; parts of the OA need a <strong>webcam</strong> (takes your picture); candidates in <strong>North America need a student/government photo ID</strong>.</li>
+          <li><strong>HackerRank default (every test):</strong> copy-paste tracking, tab/focus tracking (frequency + duration away), and MOSS code-similarity comparison with other submissions.</li>
+          <li><strong>Optional employer add-ons:</strong> AI plagiarism detection, periodic webcam image proctoring, Secure Mode (full-screen, single monitor, blocks external paste), Proctor Mode (screen recording + AI review), Desktop App mode. Which ones Amazon enabled for your test is <strong>not published</strong>.</li>
+          <li><strong>Webcam reports conflict:</strong> Oct 2026 reports describe webcam + face snapshot + ID photo before start; Apr–Aug reports describe no camera / no browser lock, only a paste warning. <strong>Assume webcam + screen + ID are on.</strong> <span class="tag con">Conflict</span></li>
+          <li>The <strong>Q2 AI assistant transcript is recorded</strong> and visible to your evaluator (not scored). <span class="tag off">Official</span></li>
+        </ul>
+        <p class="src">Sources: <a href="https://ophyai.com/amazon-oa">OphyAI summary of Amazon/HackerRank pages</a> · <a href="https://ophyai.com/hackerrank-test">HackerRank test/proctoring guide via OphyAI (checked 3 Nov 2026)</a> · <a href="https://candidatesupport.hackerrank.com/articles/1494260168-preparing-for-your-amazon-oa">HackerRank</a></p>
+      </div>
+      <div class="card">
+        <h3>What counts as a violation</h3>
+        <ul>
+          <li>Any outside AI / person / website / device in Q1, or outside the built-in assistant in Q2</li>
+          <li>Another person helping; copying code (MOSS + paste logs)</li>
+          <li>Leaving/switching tabs repeatedly; Print Screen; a second monitor</li>
+          <li>Impersonation / ID mismatch</li>
+        </ul>
+        <p>Business Insider (Feb 2025, via summaries) reported Amazon's internal guidance that undisclosed generative-AI use in interviews can disqualify — consistent with your invite's rule. A plagiarism <em>flag</em> is reportedly surfaced to the hiring team for a human decision rather than an automatic fail — single-source; don't rely on leniency.</p>
+        <p class="src">One older-page wording says candidates “may use publicly accessible online resources but not login-gated sites” — your invite's “no external assistance/resources except the Q2 AI assistant” is stricter, and <strong>the invite wins</strong>. <span class="tag con">Conflict</span></p>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>If tech breaks <span class="tag off">Official</span></h3>
+        <ul>
+          <li>Lose internet? Submitted work is saved, <strong>the timer keeps running while offline</strong>, and the test ends at the scheduled time even if disconnected. You can log back in and continue <em>if time remains</em>.</li>
+          <li><strong>Logging out ends your attempt immediately — never log out.</strong></li>
+          <li>In-test issues: use <strong>? → Report a problem</strong>. HackerRank cannot extend time, reschedule, or share results — <strong>the recruiter decides</strong> on extension or re-invite.</li>
+          <li>Practical: wired connection if possible, charger plugged in, notifications off, nothing else running, phone away (not as a second screen). If something breaks: note the time/error, report it in-test, reconnect fast, and email the recruiter contact from the invite <em>the same day</em> with facts. Don't start a second attempt unless the recruiter authorises it.</li>
+        </ul>
+        <p class="src">Source: <a href="https://candidatesupport.hackerrank.com/articles/2859650598-frequently-asked-questions-during-the-test">HackerRank — FAQs During the Test</a></p>
+      </div>
+      <div class="card">
+        <h3>Results, cooldown, reuse</h3>
+        <ul>
+          <li><strong>No published passing score; HackerRank does not send scores to candidates</strong> — Amazon owns the report and decides what to share.</li>
+          <li><strong>Timing:</strong> SDE II official line (via summaries) is notification <strong>within 2 days</strong> of completing. Candidate reality ranges from <strong>next day to ~2 weeks</strong>; a first-hand SDE II rejection arrived at 2 days. Check spam. For multi-part OAs, contact Amazon if no completion email arrives within 24 hours of a part — and <strong>complete the final feedback survey; skipping it reportedly delays results</strong>.</li>
+          <li><strong>Cooldown if you fail (SDE II):</strong> encouraged to <strong>reapply in 6 months</strong>. <span class="tag off">Official</span> There is <strong>no self-serve retake</strong> — only a recruiter re-invite. (For new-grad OAs no retake rule is published and reports conflict.)</li>
+          <li><strong>Reuse (SDE II):</strong> <strong>one OA result counts for several SDE II roles</strong> — you shouldn't need to re-sit for every SDE II application. Hiring decisions still stay per-requisition.</li>
+          <li><strong>Deadline:</strong> typically <strong>7 days from send</strong> (typically within the 1-week window). Missed deadlines generally cannot be extended — using the full week is normal and expected; don't let the link expire silently.</li>
+        </ul>
+        <p class="src">Sources: Amazon.jobs SDE II prep pages as summarised in <a href="https://www.calibrd.com/interview-prep/amazon-interview">Calibrd</a> · <a href="https://igotanoffer.com/en/advice/amazon-online-assessment">IGotAnOffer</a> · <a href="https://takeuforward.org/community/interview-experiences/amazon-sde-2-oa-assessment-experience-rejected">TakeUForward</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- UNKNOWNS -->
+  <section id="unknowns">
+    <h2>8 · What the research could not verify</h2>
+    <p class="lede">Stated plainly, so you don't plan around numbers nobody actually knows.</p>
+    <ul>
+      <li><strong>Exact pass threshold / section weightings</strong> (Q1 vs Q2 vs Work Sim vs Work Style). Amazon publishes none; prep-site percentages and thresholds found in research are unverified.</li>
+      <li><strong>Whether your 100 minutes is one pool or hard 40/60 sub-timers</strong>, and whether unused Q1 time carries over. Reports lean 40/60 separately timed — confirm on the demo/landing page.</li>
+      <li><strong>Exact Q2 stack list for your requisition</strong> (Node / Django / Spring Boot are convergent; C++ / Flask appear in fewer reports) and exact bug/test count (reports 3–8, mode ~6).</li>
+      <li><strong>Which HackerRank proctoring add-ons Amazon enabled</strong> for your requisition. Assume the strictest.</li>
+      <li><strong>OA score validity period</strong>, and reuse beyond SDE II. No duration is published — don't assume a CodeSignal-style 180-day rule applies.</li>
+      <li><strong>Work Simulation / Work Style scoring algorithms</strong> — expert-model and consistency-check descriptions are secondary-source inferences, not Amazon publications.</li>
+      <li><strong>Whether your Work Simulation is timed at exactly 15 minutes</strong> or untimed-in-practice — reports for similar invites say the label understates the time needed.</li>
+    </ul>
+  </section>
+
+  <!-- SOURCES -->
+  <section id="sources">
+    <h2>Sources</h2>
+    <p class="lede">All read/crawled November 2026 unless dated otherwise. “Official” = Amazon or HackerRank; everything else is candidate-report synthesis and labelled as such in the text above.</p>
+    <ol class="srclist">
+      <li><strong>[Official]</strong> HackerRank Candidate Support — Preparing for your Amazon OA — <a href="https://candidatesupport.hackerrank.com/articles/1494260168-preparing-for-your-amazon-oa">candidatesupport.hackerrank.com</a> — Coding + Code Repository structure, cannot-go-back, framework lock, 2 sample + 13 hidden tests, AI Assistant limits/transcript, IDE/Run Tests/autosave, browser requirements.</li>
+      <li><strong>[Official]</strong> About Amazon — “How 3 AI innovations are creating a better experience for candidates in Amazon's hiring process,” 22 Jan 2026 — <a href="https://www.aboutamazon.com/news/workplace/artificial-intelligence-resume-jobs-hiring-amazon">aboutamazon.com</a> — Reimagined assessments with an interactive AI assistant.</li>
+      <li><strong>[Official]</strong> HackerRank Candidate Support — FAQs During the Test — <a href="https://candidatesupport.hackerrank.com/articles/2859650598-frequently-asked-questions-during-the-test">candidatesupport.hackerrank.com</a> — Internet loss, log-out ends attempt, Report a problem, recruiter decides extension/re-invite.</li>
+      <li>Amazon.jobs OA prep pages (older format) as summarised/checked Nov 2026 in: <a href="https://ophyai.com/amazon-oa">OphyAI</a> (checked 3 Nov 2026) · <a href="https://www.calibrd.com/interview-prep/amazon-interview">Calibrd</a> · <a href="https://www.vervecopilot.com/hot-blogs/amazon-online-assessment-design">Verve</a> — Old-format timings, 7 days / 2-day result / 6-month reapply / SDE II reuse, code-quality statements, Work Simulation description.</li>
+      <li>Nyrion — Amazon's AI-assisted OA (31 candidate threads, to 31 Oct 2026) — <a href="https://nyrion.ai/companies/amazon">nyrion.ai</a> — Repo bug taxonomy, ~6 tests, assistant as navigator, Q1 Medium-Hard, partial-credit reports.</li>
+      <li>Bugnik — Amazon OA code repository question, 22 Oct 2026 — <a href="https://bugnik.com/guides/amazon-oa-code-repository-question">bugnik.com</a> — 40+60 reports, stacks, bug counts, workflow.</li>
+      <li>IGotAnOffer — Amazon Online Assessment, updated 2 Oct 2026 — <a href="https://igotanoffer.com/en/advice/amazon-online-assessment">igotanoffer.com</a> — Standard vs AI format, Medium baseline, practice tests, timing reports.</li>
+      <li>PraxisAI — Amazon AI-assisted OA, updated 5 Nov 2026 — <a href="https://www.praxisai.site/guides/amazon-ai-assisted-online-assessment">praxisai.site</a> — Repo reports, stack guidance, handler-bug patterns.</li>
+      <li>TakeUForward — Amazon SDE-2 OA Assessment Experience (first-hand) — <a href="https://takeuforward.org/community/interview-experiences/amazon-sde-2-oa-assessment-experience-rejected">takeuforward.org</a> — 40+60 split, 15-min Work Sim, 10-min Work Style, 2-day rejection.</li>
+      <li>AceOffer — Amazon Interview Process (198 candidate reports, Oct 2025–Nov 2026) — <a href="https://aceoffer.app/interviews/amazon/interview-process">aceoffer.app</a> — 40+60 convergence, repo domains, timings.</li>
+      <li>HackerRank test/proctoring defaults via OphyAI — <a href="https://ophyai.com/hackerrank-test">ophyai.com/hackerrank-test</a> (checked 3 Nov 2026) — Copy-paste/tab/MOSS defaults, Secure/Proctor add-ons, no candidate score reports, retake only by re-invite.</li>
+    </ol>
+  </section>
+
+  <footer>
+    <p>General preparation research. Research snapshot: November 2026. No leaked assessment questions or answers are included — problem names above are generic practice types and patterns only. This page is preparation guidance only; the assessment itself is solo work under the invite rules in §7.</p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var btns = Array.prototype.slice.call(document.querySelectorAll('[data-crit]'));
+  var out = document.getElementById('verdictOut');
+  function render(){
+    var n = btns.filter(function(b){ return b.classList.contains('on'); }).length;
+    btns.forEach(function(b){
+      var dot = b.querySelector('.dot');
+      dot.textContent = b.classList.contains('on') ? '✓' : '';
+      b.setAttribute('aria-pressed', b.classList.contains('on') ? 'true' : 'false');
+    });
+    if(n === 0){ out.className=''; out.textContent=''; return; }
+    if(n === btns.length){
+      out.className='go';
+      out.innerHTML = '<strong>GO for tomorrow.</strong> All five checks are green. Do the T-90 warm-up only, secure the full uninterrupted block, and start rested. In-test: Q1 hard-stop ~40 min, Q2 tests-first, check the Work Sim scale direction, Work Style first-instinct.';
+    } else {
+      out.className='wait';
+      out.innerHTML = '<strong>' + n + ' of 5 — not yet.</strong> The research call is WAIT until all five are green. Finish tonight\u2019s blocks, re-check, and if any box is still unticked, take the middle path: sit on day 3\u20134 of the window (deadline Thu the deadline) after a full mock. There is no reported day-1 advantage to protect.';
+    }
+  }
+  btns.forEach(function(b){
+    b.setAttribute('aria-pressed','false');
+    b.addEventListener('click', function(){ b.classList.toggle('on'); render(); });
+  });
+  render();
+})();
+</script>
+<script>
+(function(){
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly','');
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch(e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+  document.querySelectorAll('[data-copy]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var card = btn.closest('.prompt');
+      var txt = card ? card.querySelector('.txt').textContent.trim() : '';
+      function done(ok){
+        btn.textContent = ok ? 'Copied ✓' : 'Select the text above to copy';
+        btn.classList.toggle('done', ok);
+        setTimeout(function(){ btn.textContent = 'Copy prompt'; btn.classList.remove('done'); }, 2200);
+      }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(txt).then(function(){ done(true); }, function(){ done(fallbackCopy(txt)); });
+      } else {
+        done(fallbackCopy(txt));
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>

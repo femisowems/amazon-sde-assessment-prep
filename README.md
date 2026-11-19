@@ -4,6 +4,10 @@ Research notes and a preparation guide for the current (2025–2026) Amazon Soft
 
 This is general preparation material only. It contains **no leaked assessment questions or answers**, and no information about any individual's application, requisition, or assessment. It is not affiliated with Amazon or HackerRank.
 
+## Online version
+
+- **[index.html](index.html)** — the full briefing as a standalone web page (also served via GitHub Pages when enabled: `https://femisowems.github.io/amazon-sde-assessment-prep/`)
+
 ## What's inside
 
 - **[REPORT.md](REPORT.md)** — the full research report:
