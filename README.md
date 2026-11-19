@@ -4,6 +4,8 @@ A research-based preparation guide for the current (2025–2026) Amazon Software
 
 **Live version:** https://femisowems.github.io/amazon-sde-assessment-prep/
 
+**Quick reference:** https://femisowems.github.io/amazon-sde-assessment-prep/quick.html
+
 ## Contents
 
 | File | What it is |
