@@ -8,7 +8,8 @@ A research-based preparation guide for the current (2025–2026) Amazon Software
 
 | File | What it is |
 |---|---|
-| [index.html](index.html) | The full briefing as a standalone web page — start here |
+| [quick.html](quick.html) | **Condensed quick reference** — workflows, prompts, quick hints, and JS solution templates for the sitting itself ([live](https://femisowems.github.io/amazon-sde-assessment-prep/quick.html)) |
+| [index.html](index.html) | The full briefing as a standalone web page |
 | [REPORT.md](REPORT.md) | The complete research report in Markdown, with sources and a prompt-kit appendix |
 
 ## What the guide covers
